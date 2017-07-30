@@ -6,7 +6,7 @@ categories: Java Date calculation
 ---
 For many years I used similar Date `truncate()` or `add()` operations as implemented in apache-commons-langs `DateUtils` class.
 
-Have you ever investigated how many CPU cycles we are wasted during every date manipulation ?
+Have you ever looked at how many CPU cycles we are wasting during every date manipulation ?
 
 Refer to [DateCalculationsPerformanceTest](https://github.com/rohandhapodkar/suggested-java-best-practices/blob/master/src/test/java/test/java/util/date/DateCalculationsPerformanceTest.java) where `DateUtils.truncate()` method was called 10 Million times in 2 parallel threads.
 
@@ -16,7 +16,8 @@ Refer to [DateCalculationsPerformanceTest](https://github.com/rohandhapodkar/sug
 | Call `org.apache.commons.lang3.time.DateUtils.truncate()` 10 M times | 18.967 |
 | New `DateUtils.truncatedate()` 10 M times | 3.438 |
 
-*Results based on Intel Core 2 Duo 2GH, Fedora 22*
+<br>
+*Results based on Intel Core 2 Duo 2 GHz, Fedora 22 64-bit, Oracle JDK 1.8.0_131*
 
 
 If your application is doing frequent date manipulations like truncate, addDate, get Next/Previous business date, then it's worth caching those results for better performance.
@@ -34,15 +35,15 @@ This is sample a prototype which can be extended further as per your requirement
 
 This prototype assumes few extra MB's does not overload your system in exchange of faster date calculations.
 
-> VisualVM shows retain size as 3 MB for all dates from 1970-1-1 to 2017-07-26.
+> VisualVM shows retain size as 3 MB for all dates between 1970-1-1 and 2017-07-26.
 
 
 {{ site.data.format.list }} Why only `ConcurrentSkipListMap` ?
 
 - It's a ConcurrentMap implementation.
-- It's a `NavigableMap` map, which means `floorEntry()` method can be used to returns greatest date less than or equal to given date 
+- It's a `NavigableMap` map, which means `floorEntry()` method can be used to returns greatest date less than or equal to given Date. This is the best way to truncate the time from Date and lookup for corresponding Date.
 
-{{ site.data.format.list }} What are the limitations of this implementation
+{{ site.data.format.list }} What are the limitations of this implementation ?
 
 - It assumes all your dates are using Single timezone. If you are looking for date calculations across multiple time zones then this implementation may not suit your requirement. 
 - Not tested for dates prior to 1970-01-01
