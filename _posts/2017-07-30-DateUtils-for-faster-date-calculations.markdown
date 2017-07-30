@@ -4,40 +4,46 @@ title:  "DateUtils for faster date calculations"
 date:   2017-07-30 12:56:04 +0530
 categories: Java Date calculation
 ---
-For past many years I used similar Date `truncate()` or `add()` operations as implemented in apache-commons-langs `DateUtils` class.
+For many years I used similar Date `truncate()` or `add()` operations as implemented in apache-commons-langs `DateUtils` class.
 
-Have you ever investigated how many CPU cycles are wasted during every date manipulation ?
+Have you ever investigated how many CPU cycles we are wasted during every date manipulation ?
 
-Refer to [DateCalculationsPerformanceTest](https://github.com/rohandhapodkar/suggested-java-best-practices/blob/master/src/test/java/test/java/util/date/DateCalculationsPerformanceTest.java) where `DateUtils.truncate()` method was called 10 Million times in many parallel threads.
+Refer to [DateCalculationsPerformanceTest](https://github.com/rohandhapodkar/suggested-java-best-practices/blob/master/src/test/java/test/java/util/date/DateCalculationsPerformanceTest.java) where `DateUtils.truncate()` method was called 10 Million times in 2 parallel threads.
 
 | Scenario | Time (sec) |
 |:-------|-------:|
 | Add long numbers 10 M times | 0.046 |
 | Call `org.apache.commons.lang3.time.DateUtils.truncate()` 10 M times | 18.967 |
 | New `DateUtils.truncatedate()` 10 M times | 3.438 |
+*Results based on Intel Core 2 Duo 2GH, Fedora 22*
 
-
-<br>
 
 If your application is doing frequent date manipulations like truncate, addDate, get Next/Previous business date, then it's worth caching those results for better performance.
 
-Below is the sample DateUtils implementation using ConcurrentSkipListMap for efficient date look up. This DateUtils class pre computes results for Date operations like nextDate.
+Below is the sample [`DateUtils`](#DateUtils.source) implementation using `ConcurrentSkipListMap` for efficient date look up. This DateUtils class pre computes results for Date operations like nextDate.
 
-This is just a prototype which can be extended further as per your requirements. eg.
+This is sample a prototype which can be extended further as per your requirements.
 
-- Caching first/last day of the month, adding some pre-configured days like SLA timelines from given date.
+{{ site.data.format.list }} Some extension to this can be:
+
+- Caching first/last day of the month, adding some pre-configured days for SLA.
 - Eager initialization of dates map.
-- Return List/Iterator for all dates between given dates and so on.
-To cache frequest Date to String conversion.
+- Return List/Iterator for all dates between given dates.
+- Cache Date to String conversion.
 
-This prototype assumes 3 MB memory is not a constrain for your system and you are looking for performance efficient solution for frequent date calculations.
-VisualVM shows retain size as 3 MB for all dates from 1970-1-1 to 2017-07-26.
+This prototype assumes few extra MB's does not overload your system in exchange of faster date calculations.
 
-- What are the limitations of this implementation
+> VisualVM shows retain size as 3 MB for all dates from 1970-1-1 to 2017-07-26.
 
-It assumes all your dates are using Single timezone. If you are looking for date calculations across multiple time zones then this implementation may not suite your requirement. 
+{{ site.data.format.list }} What are the limitations of this implementation
 
-{% highlight java linenos %}
+- It assumes all your dates are using Single timezone. If you are looking for date calculations across multiple time zones then this implementation may not suit your requirement. 
+- Not tested for dates prior to 1970-01-01
+
+
+
+<a name="DateUtils.source"/>
+{% highlight java %}
 package test.java.util.date;
 
 import java.util.Calendar;
@@ -45,7 +51,7 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class DateUtils {
+public class DateUtils 
 	private static ConcurrentSkipListMap<Long, DateCalculations> dateMap = new ConcurrentSkipListMap<>();
 	
 	static class DateCalculations {
