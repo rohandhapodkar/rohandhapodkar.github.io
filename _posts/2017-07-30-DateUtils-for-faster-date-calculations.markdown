@@ -15,6 +15,7 @@ Refer to [DateCalculationsPerformanceTest](https://github.com/rohandhapodkar/sug
 | Add long numbers 10 M times | 0.046 |
 | Call `org.apache.commons.lang3.time.DateUtils.truncate()` 10 M times | 18.967 |
 | New `DateUtils.truncatedate()` 10 M times | 3.438 |
+
 *Results based on Intel Core 2 Duo 2GH, Fedora 22*
 
 
@@ -35,11 +36,16 @@ This prototype assumes few extra MB's does not overload your system in exchange 
 
 > VisualVM shows retain size as 3 MB for all dates from 1970-1-1 to 2017-07-26.
 
+
+{{ site.data.format.list }} Why only `ConcurrentSkipListMap` ?
+
+- It's a ConcurrentMap implementation.
+- It's a `NavigableMap` map, which means `floorEntry()` method can be used to returns greatest date less than or equal to given date 
+
 {{ site.data.format.list }} What are the limitations of this implementation
 
 - It assumes all your dates are using Single timezone. If you are looking for date calculations across multiple time zones then this implementation may not suit your requirement. 
 - Not tested for dates prior to 1970-01-01
-
 
 
 <a name="DateUtils.source"/>
