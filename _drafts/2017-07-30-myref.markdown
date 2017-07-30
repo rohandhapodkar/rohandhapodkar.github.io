@@ -1,0 +1,25 @@
+---
+layout: post
+title:  "Jekyll's quick reference"
+date:   2017-07-30 
+categories: Java Date calculation
+---
+- How to start Jekylls with Drafts ?    
+`jekyll serve --incremental -D`  
+
+- Code formatting with line no  
+``` script
+{\% highlight ruby linenos %}
+def foo  
+  puts 'foo' 
+end  
+{\% endhighlight %}
+```
+
+{% highlight ruby linenos %}
+def foo
+  puts 'foo'
+end
+{% endhighlight %}
+
+
