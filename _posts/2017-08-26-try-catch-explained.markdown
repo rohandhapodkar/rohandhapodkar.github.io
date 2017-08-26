@@ -55,12 +55,13 @@ With above source code, Exception can be generated from multiple methods. Below 
 - **Happy path**. No exceptions and ResultSet copied successfully to file. This is what developers always expect.
 - `SQLException` can be thrown while initializing exception in `getConnection()`.
 - `IOException` can be thrown while initializing Writer inside `getFileWriter()`.
+- Connection or Writer instance can be `null`.
 - `IOException`, `SQLException`, `ValidationException` or any `RuntimeException` can be thrown from `copyResultSetToStream()` method. If ValidationException is thrown, it should be propagated back to caller.
 - `IOException` can be thrown while closing the stream at the end of try block
 - `SQLException` is possible while closing Connection at the end of try block
 
 If any Exception is thrown, all resources should be closed. This is the most trickiest part when more than one resources are not used as `AutoCloseable` resource.
-Even most trickiest part of this Exception handling is throwing back the Appropriate exception.
+Even most trickiest part of this Exception handling is throwing back the appropriate exception.
 
 eg. *if ValidationException or any RuntimeException is thrown, then same Exception should be raised back to the caller and any Exception raised during closing down the resource should be suppressed or in short Exception which was raised first, should be reported to caller*
 
@@ -69,7 +70,7 @@ eg. *if ValidationException or any RuntimeException is thrown, then same Excepti
 If you are using try with resource, compiler will handle this complexity and will generate necessary exception handling on behalf of you.
 
 #### Suppressed Exception
-With Java 5, when try with resource is introduced, `suppressedExceptions` was silently added to `Throwable`. With the help of Suppressed Exception, any Exception generated during closing down resource, are suppressed and recorded against main Exception.
+With Java 5, when try with resource was introduced, `suppressedExceptions` was silently added to `Throwable`. With the help of Suppressed Exception, any Exception generated while closing resource, are suppressed and recorded against main Exception.
 
 Let's assume `ValidationException` is thrown from `copyResultSetToFile()` method and at the same time, while closing both Connection and Writer instances, `SQLException` and `IOException` exception thrown respectively. `ValidationException` will be thrown back to caller and SQLException and IOException's are recorded as suppressed Exception. Your Exception stack trace will look like something similar to below one. As mentioned on line 9 and 11, suppressed Exception will be logged.
 
